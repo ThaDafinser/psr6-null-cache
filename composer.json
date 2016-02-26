@@ -1,0 +1,35 @@
+{
+    "name": "thadafinser/psr6-null-cache",
+    "description": "PSR-6 cache NullObject implementation, to use it as default and or testing",
+    
+    "license": "MIT",
+    
+    "authors": [
+        {
+            "name": "Martin Keckeis",
+            "email": "martin.keckeis1@gmail.com"
+        }
+    ],
+    
+    "autoload": {
+        "psr-4": {
+            "Psr6NullCache\\":  "src"
+        }
+    },
+    
+    "autoload-dev": {
+        "psr-4": {
+            "Psr6NullCacheTest\\Unit\\":  "tests/unit"
+        }
+    },
+    
+    "require": {
+        "psr/cache": "^1.0"
+    },
+    
+    "require-dev": {
+        "phpunit/phpunit": "^5.2",
+        "fabpot/php-cs-fixer": "^1.11"
+    }
+    
+}
