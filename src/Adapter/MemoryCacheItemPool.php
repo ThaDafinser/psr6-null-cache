@@ -1,11 +1,21 @@
 <?php
-namespace Psr6NullCache;
+namespace Psr6NullCache\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
+use DateTime;
+use Psr6NullCache\CacheItem;
 
-final class NullCacheItemPool implements CacheItemPoolInterface
+final class MemoryCacheItemPool implements CacheItemPoolInterface
 {
+
+    /**
+     *
+     * @var array
+     */
+    private $data = [];
+
+    private $deferred = [];
 
     /**
      * Returns a Cache Item representing the specified key.
@@ -23,7 +33,11 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function getItem($key)
     {
-        return new CacheItem($key, null, false);
+        if ($this->hasItem($key) !== true) {
+            $this->data[$key] = new CacheItem($key, null, false);
+        }
+        
+        return $this->data[$key];
     }
 
     /**
@@ -68,6 +82,16 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function hasItem($key)
     {
+        if (isset($this->data[$key])) {
+            
+            /* @var $item \Psr6NullCache\CacheItem */
+            $item = $this->data[$key];
+            
+            if ($item->isHit() === true && ($item->getExpires() === null || $item->getExpires() > new DateTime())) {
+                return true;
+            }
+        }
+        
         return false;
     }
 
@@ -78,6 +102,8 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function clear()
     {
+        $this->data = [];
+        
         return true;
     }
 
@@ -94,6 +120,8 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
+        unset($this->data[$key]);
+        
         return true;
     }
 
@@ -110,6 +138,10 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function deleteItems(array $keys)
     {
+        foreach ($keys as $key) {
+            $this->deleteItem($key);
+        }
+        
         return true;
     }
 
@@ -123,6 +155,10 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
+        $item->setIsHit(true);
+        
+        $this->data[$item->getKey()] = $item;
+        
         return true;
     }
 
@@ -136,6 +172,8 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
+        $this->deferred[$item->getKey()] = $item;
+        
         return true;
     }
 
@@ -146,6 +184,13 @@ final class NullCacheItemPool implements CacheItemPoolInterface
      */
     public function commit()
     {
+        foreach ($this->deferred as $item) {
+            /* @var $item \Psr6NullCache\CacheItem */
+            $this->save($item);
+        }
+        
+        $this->deferred = [];
+        
         return true;
     }
 }

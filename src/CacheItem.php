@@ -2,6 +2,9 @@
 namespace Psr6NullCache;
 
 use Psr\Cache\CacheItemInterface;
+use DateTimeInterface;
+use DateInterval;
+use DateTime;
 
 final class CacheItem implements CacheItemInterface
 {
@@ -24,11 +27,18 @@ final class CacheItem implements CacheItemInterface
      */
     private $isHit;
 
-    public function __construct($key, $value, $isHit)
+    /**
+     *
+     * @var null DateTimeInterface
+     */
+    private $expires;
+
+    public function __construct($key, $value, $isHit, DateTimeInterface $expires = null)
     {
         $this->key = $key;
         $this->value = $value;
         $this->isHit = (bool) $isHit;
+        $this->expires = $expires;
     }
 
     /**
@@ -57,7 +67,16 @@ final class CacheItem implements CacheItemInterface
      */
     public function get()
     {
+        if ($this->isHit() !== true) {
+            return null;
+        }
+        
         return $this->value;
+    }
+
+    public function setIsHit($mode = true)
+    {
+        $this->isHit = $mode;
     }
 
     /**
@@ -71,6 +90,15 @@ final class CacheItem implements CacheItemInterface
     public function isHit()
     {
         return $this->isHit;
+    }
+
+    /**
+     *
+     * @return DateTimeInterface null
+     */
+    public function getExpires()
+    {
+        return $this->expires;
     }
 
     /**
@@ -95,7 +123,7 @@ final class CacheItem implements CacheItemInterface
     /**
      * Sets the expiration time for this cache item.
      *
-     * @param \DateTimeInterface $expiration
+     * @param \DateTimeInterface $expires
      *            The point in time after which the item MUST be considered expired.
      *            If null is passed explicitly, a default value MAY be used. If none is set,
      *            the value should be stored permanently or for as long as the
@@ -103,8 +131,14 @@ final class CacheItem implements CacheItemInterface
      *            
      * @return static The called object.
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expires)
     {
+        if ($expires instanceof DateTimeInterface) {
+            $this->expires = $expires;
+        } else {
+            $this->expires = null;
+        }
+        
         return $this;
     }
 
@@ -122,6 +156,19 @@ final class CacheItem implements CacheItemInterface
      */
     public function expiresAfter($time)
     {
+        if ($time instanceof DateInterval) {
+            $expires = new DateTime();
+            $expires->add($time);
+            
+            $this->expires = $expires;
+        } elseif (is_numeric($time)) {
+            $expires = new DateTime('now +' . $time . ' seconds');
+            
+            $this->expires = $expires;
+        } else {
+            $this->expires = null;
+        }
+        
         return $this;
     }
 }
