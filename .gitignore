@@ -1,4 +1,7 @@
-/vendor/
+
 .buildpath
 .project
+.php_cs.cache
+
 .settings/
+vendor/
