@@ -1,6 +1,6 @@
 {
     "name": "thadafinser/psr6-null-cache",
-    "description": "PSR-6 cache NullObject implementation, to use it as default and or testing",
+    "description": "PSR-6 cache NullObject implementation, to avoid null checks and for testing",
     
     "license": "MIT",
     
@@ -24,7 +24,8 @@
     },
     
     "require": {
-        "php": ">=5.6",
+        "php": "~7.0",
+        
         "psr/cache": "^1.0"
     },
     

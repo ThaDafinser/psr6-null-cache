@@ -1,12 +1,12 @@
 <?php
-namespace Psr6NullCacheTest\Unit;
+namespace Psr6NullCacheTest\Unit\Adapter;
 
 use PHPUnit_Framework_TestCase;
 use Psr6NullCache\CacheItem;
-use Psr6NullCache\NullCacheItemPool;
+use Psr6NullCache\Adapter\NullCacheItemPool;
 
 /**
- * @covers Psr6NullCache\NullCacheItemPool
+ * @covers Psr6NullCache\Adapter\NullCacheItemPool
  */
 class NullCacheItemPoolTest extends PHPUnit_Framework_TestCase
 {
