@@ -57,6 +57,7 @@ class MyCode
     {
         $cacheKey = 'myKey';
         
+        // you need to check first, if there is a cache instance around
         if ($this->getCache() !== null && $this->getCache()->hasItem($cacheKey) === true) {
             // cache is available + it has a cache hit!
             return $this->getCache()->getItem($cacheKey);
@@ -64,6 +65,7 @@ class MyCode
         
         $result = do_something_heavy();
         
+        // you need to check first, if there is a cache instance around
         if ($this->getCache() !== null) {
             $item = $this->getCache()->getItem($cacheKey);
             $item->set($result);
