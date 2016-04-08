@@ -35,7 +35,7 @@
     },
     
     "provide": {
-        "psr/cache": "1.0.0"
+        "psr/cache-implementation": "1.0.0"
     }
     
 }
